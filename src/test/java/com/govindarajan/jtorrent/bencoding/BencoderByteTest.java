@@ -5,7 +5,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("Bencoder Testing")
 public class BencoderByteTest {
-    private BencoderBytes bencoder;
+    private BencodeDecoder bencoder;
     @BeforeAll
     public static void setupAll(){
         System.out.println("Bencoder test started");
@@ -21,7 +20,7 @@ public class BencoderByteTest {
     @Test
     void testStringBencoder(){
         String val = "4:demo";
-        bencoder = new BencoderBytes(val.getBytes(StandardCharsets.UTF_8));
+        bencoder = new BencodeDecoder(val.getBytes(StandardCharsets.UTF_8));
         String actual = new String((byte[]) bencoder.decode(), StandardCharsets.UTF_8);
         String expected = "demo";
         assertEquals(expected, actual);
@@ -50,7 +49,7 @@ public class BencoderByteTest {
     @Test
     void testListBencoder(){
         String val = "l4:spami42ee";
-        bencoder = new BencoderBytes(val.getBytes(StandardCharsets.UTF_8));
+        bencoder = new BencodeDecoder(val.getBytes(StandardCharsets.UTF_8));
         List<Object> actual = (List<Object>) bencoder.decode();
         assertEquals(2, actual.size());
         byte[] firstElement = (byte[]) actual.get(0);
@@ -66,7 +65,7 @@ public class BencoderByteTest {
 //    }
     @Test
     void testDictBencoder(){
-        bencoder = new BencoderBytes(
+        bencoder = new BencodeDecoder(
                 "d3:cow3:moo4:spam4:eggse"
                         .getBytes(StandardCharsets.UTF_8)
         );
