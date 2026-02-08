@@ -4,6 +4,9 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+/**
+ * To decode bencoded dictionary,list,int,string from torrent file.
+ */
 public class BencodeDecoder {
     byte[] raw;
     ByteBuffer buffer;
@@ -12,7 +15,7 @@ public class BencodeDecoder {
         this.raw = text;
         buffer = ByteBuffer.wrap(raw);
     }
-
+    // Entry point into the decoding.
     public Object decode() {
         if (Character.isDigit(buffer.get(buffer.position())))
             return decodeBencodedString();

@@ -1,70 +1,77 @@
-package com.govindarajan.jtorrent.bencoding;
+package com.govindarajan.jtorrent.legacy.bencoding;
+
+import com.govindarajan.jtorrent.bencoding.BencodeDecoder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-public class Bencoder {
+/**
+ * @deprecated This was a learning implementation. Use {@link BencodeDecoder} instead.
+ */
+@Deprecated
+public class LegacyStringBencoder {
     // The raw bencode
     private String raw;
     // Current index
     private int cursor;
 
-    public Bencoder(String raw){
+    public LegacyStringBencoder(String raw) {
         this.raw = raw;
     }
 
     // Entry point to decode
-    public Object decode(){
-        if(Character.isDigit(raw.charAt(cursor)))
+    public Object decode() {
+        if (Character.isDigit(raw.charAt(cursor)))
             return decodeBencodedString();
-        if(raw.charAt(cursor) == 'i')
+        if (raw.charAt(cursor) == 'i')
             return decodeBencodedInteger();
-        if(raw.charAt(cursor) == 'l')
+        if (raw.charAt(cursor) == 'l')
             return decodeBencoderList();
-        if(raw.charAt(cursor) == 'd')
+        if (raw.charAt(cursor) == 'd')
             return decodeBencoderDictionary();
         return null;
     }
+
     // Helper to decode string 4:qwer
-    public String decodeBencodedString(){
+    public String decodeBencodedString() {
         int start_idx = cursor;
-        while(true){
-            if(raw.charAt(cursor) == ':')
+        while (true) {
+            if (raw.charAt(cursor) == ':')
                 break;
             cursor++;
         }
         int end_idx = cursor;
         int size = Integer.parseInt(raw.substring(start_idx, end_idx));
         cursor += size + 1;
-        return raw.substring(end_idx+1, cursor);
+        return raw.substring(end_idx + 1, cursor);
     }
 
     // Helper to decode integer
-    public Integer decodeBencodedInteger(){
-        int start_idx = cursor+1;
+    public Integer decodeBencodedInteger() {
+        int start_idx = cursor + 1;
         int end_idx;
-        while(true){
-            if(raw.charAt(cursor) == 'e')
+        while (true) {
+            if (raw.charAt(cursor) == 'e')
                 break;
             cursor++;
         }
         end_idx = cursor;
-        cursor +=1;
-        String decodedValue = raw.substring(start_idx , end_idx);
-        if(decodedValue.startsWith("-0"))
+        cursor += 1;
+        String decodedValue = raw.substring(start_idx, end_idx);
+        if (decodedValue.startsWith("-0"))
             throw new NumberFormatException("invalid bencoded integer: cannot start with -0");
-        if(decodedValue.length() > 1 && decodedValue.startsWith("0"))
+        if (decodedValue.length() > 1 && decodedValue.startsWith("0"))
             throw new RuntimeException("invalid bencoded integer: cannot start with zero");
         return Integer.valueOf(decodedValue);
     }
+
     // l l 4:spam e i42e e
-    public List<Object> decodeBencoderList(){
+    public List<Object> decodeBencoderList() {
         List<Object> result = new ArrayList<>();
         cursor++;
-        while(cursor < raw.length()-1){
-            if(raw.charAt(cursor) == 'e'){
+        while (cursor < raw.length() - 1) {
+            if (raw.charAt(cursor) == 'e') {
                 cursor++;
                 return result;
             }
@@ -72,11 +79,12 @@ public class Bencoder {
         }
         return result;
     }
+
     // d3:cow3:moo4:spam4:eggse
-    public Map<Object, Object> decodeBencoderDictionary(){
-        Map<Object,Object> result = new HashMap<>();
+    public Map<Object, Object> decodeBencoderDictionary() {
+        Map<Object, Object> result = new HashMap<>();
         cursor++;
-        while(raw.charAt(cursor) != 'e'){
+        while (raw.charAt(cursor) != 'e') {
             result.put(decode(), decode());
         }
         cursor++;

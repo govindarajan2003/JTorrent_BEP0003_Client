@@ -58,7 +58,7 @@ public class BencodeEncoder {
             baos.write(encode(key));
             baos.write(encode(map.get(key)));
         }
-        baos.write('e');
+        baos.write('e') ;
         return baos.toByteArray();
     }
 }

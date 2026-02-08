@@ -11,7 +11,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("Bencoder Testing")
-public class BencoderByteTest {
+public class LegacyStringBencoderByteTest {
     private BencodeDecoder bencoder;
     @BeforeAll
     public static void setupAll(){
