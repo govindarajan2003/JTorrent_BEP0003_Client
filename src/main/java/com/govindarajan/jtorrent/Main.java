@@ -22,7 +22,7 @@ public class Main {
 
         Map<String, Object> metaInfo = (Map<String, Object>) bencoder.decode();
         Map<String, Object> infoMap = (Map<String, Object>) metaInfo.get("info");
-
+        System.out.println(infoMap.keySet());
 
         byte[] infoHash = TrackerUtils.calculateInfoHash(infoMap);
         List<String> urls = TrackerUtils.getAnnounceList(metaInfo);
@@ -30,6 +30,6 @@ public class Main {
 
         Long fileLength = (Long) infoMap.get("length");
         TrackerClient client = new HttpTrackerClient();
-        List<Peer> peers = client.getPeers(urls.get(0),infoHash,fileLength);
+       // List<Peer> peers = client.getPeers(urls.get(0),infoHash,fileLength);
     }
 }
