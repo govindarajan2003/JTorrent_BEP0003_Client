@@ -5,6 +5,9 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
+/**
+ * Responsible for creating Handshake request and parsing the Handshake response.
+ */
 public class Handshake {
     byte[] infoHash;
     byte[] peerId;
@@ -17,7 +20,12 @@ public class Handshake {
         this.infoHash = infoHash;
         this.peerId = peerId;
     }
-    // Structure: [Protocol(19)][Reserved(8)][InfoHash(20)][PeerId(20)]
+
+    /**
+     * Serializes the handshake into a byte array.
+     * Format: [19][Protocol String][Reserved(8)][InfoHash(20)][PeerId(20)]
+     * @return The 68-byte array ready to be sent.
+     */
     public byte[] getBytes(){
         ByteBuffer buffer = ByteBuffer.allocate(68);
         buffer.put((byte) 19);
@@ -27,22 +35,25 @@ public class Handshake {
         buffer.put(peerId);
         return buffer.array();
     }
-    // Structure: [Protocol(19)][Reserved(8)][InfoHash(20)][PeerId(20)]
+
+    /**
+     * Parses a received handshake from a peer.
+     * @param response The 68-byte array received from the network.
+     * @return A Handshake object containing the peer's Info Hash and Peer ID.
+     * @throws RuntimeException if protocol string or length is invalid.
+     */
     public static Handshake parse(byte[] response){
         if(response.length != 68)
             throw new RuntimeException("Invalid handshake length"+ response.length);
         if(response[0] != 19)
             throw new RuntimeException("Unknown protocol length");
-        // In networking, ISO_8859_1 is a very "safe" encoding.
-        // It maps bytes 1-to-1 with characters.
-        // If you used UTF-8, and there was some weird binary garbage
-        // immediately after the name, Java might get confused and try
-        // to combine bytes. ISO_8859_1 ensures that 1 byte equals exactly 1 character,
-        // which keeps the data clean.
+        /* ISO_8859_1 ensures that 1 byte equals exactly 1 character,
+           which keeps the data clean. UTF-8 may insert garbage data.
+         */
         String protocol = new String(response, 1, 19,StandardCharsets.ISO_8859_1);
         if(!"BitTorrent protocol".equals(protocol))
             throw new RuntimeException("Unkown Protocol");
-        // 28(inclusive) 48(excluded)
+        // CopyOfRange includes 28 and excludes 48
         byte[] infoHash = Arrays.copyOfRange(response, 28, 48);
         byte[] peerId = Arrays.copyOfRange(response,48,68);
         return new Handshake(infoHash, peerId);
